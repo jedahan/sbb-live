@@ -1,11 +1,22 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
+import lines from "./log.js";
 
-const records: Game[] = [
-  { hero: "Merlin", place: 7, mmr: -111 },
-  { hero: "Apocalypse", place: 1, mmr: +42 },
-];
+const heros = ["Merlin", "Sharebear", "Mordred", "Apocalypse"] as const;
+type Hero = typeof heros[number];
+
+const HeroIDs: Record<string, Hero> = {
+  '5e525924-1173-46c8-89c6-4729777818df': "Merlin",
+}
+
+const records: Game[] = lines
+  .map(({Hero: { Card: { ID } }, Placement }) => ({
+     hero: HeroIDs[ID] ?? 'Unknown',
+     placement: Placement,
+     mmr: Math.round(-100 + (25 * (8-Placement)) - 10 + (Math.random() * 20))
+    })
+  )
 
 const starting = 5396;
 
@@ -47,21 +58,18 @@ function App() {
   );
 }
 
-type Place = number;
-const isPlace = (place: number): place is Place => place > 0 && place <= 8;
-
-const heros = ["Merlin", "Sharebear", "Mordred", "Apocalypse"] as const;
-type Hero = typeof heros[number];
+type Placement = number;
+const isPlacement = (placement: number): placement is Placement => placement > 0 && placement <= 8;
 
 type Mmr = number;
 
 interface Game {
   hero: Hero;
-  place: Place;
+  placement: Placement;
   mmr: Mmr;
 }
 
-function Record({ hero, place, mmr }: Game) {
+function Record({ hero, placement, mmr }: Game, index: number) {
   const heroUri = `/assets/cards/SBB_HERO_${hero.toUpperCase()}.png`;
   const fontSize = 80;
   const textShadow = "6px 6px 2px black";
@@ -74,10 +82,9 @@ function Record({ hero, place, mmr }: Game) {
         display: "flex",
         alignItems: "end",
       }}
-      key={[hero, place, mmr].join(".")}
+      key={index}
     >
       <span
-        className="place"
         style={{
           fontSize,
           textShadow: "6px 6px 2px black",
@@ -88,7 +95,7 @@ function Record({ hero, place, mmr }: Game) {
           fontWeight: "bold",
         }}
       >
-        {place === 1 ? "👑" : place}
+        {placement === "1" ? "👑" : placement}
       </span>
 
       <span
