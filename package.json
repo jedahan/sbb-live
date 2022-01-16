@@ -7,7 +7,7 @@
     "start": "npm run test:watch & npm run serve",
     "serve": "npm run esbuild -- --sourcemap --servedir=build",
     "build": "npm run esbuild -- --minify",
-    "esbuild": "esbuild index.tsx --bundle --outfile=build/index.js",
+    "esbuild": "esbuild index.tsx --bundle --loader:.png=file --outfile=build/index.js",
     "test:watch": "npm run tsc -- --watch",
     "tsc": "tsc --noEmit"
   },
