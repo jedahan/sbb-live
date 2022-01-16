@@ -40,22 +40,21 @@ interface Game {
   mmr: Mmr;
 }
 function Record({ hero, place, mmr }: Game) {
-  const heroUri = `asssets/cards/SBB_HERO_${hero.toUpperCase()}.png`;
+  const heroUri = `/asssets/cards/SBB_HERO_${hero.toUpperCase()}.png`;
   return (
     <div
       className="record"
       style={{ flexDirection: "row" }}
       key={[hero, place, mmr].join(".")}
     >
-      <div>
-        <img src={heroUri} alt={hero} />
+      <span>
+        <img src={heroUri} alt={hero} width={300} />
         <span className="place" style={{ position: "absolute" }}>
           {place}
         </span>
-      </div>
-      <div>
-        <span className="mmr">{mmr}</span>
-      </div>
+      </span>
+
+      <span className="mmr">{mmr}</span>
     </div>
   );
 }
