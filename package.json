@@ -4,10 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "esbuild index.tsx --bundle --outfile=build/index.js",
+    "start": "npm run test:watch & npm run serve",
+    "serve": "npm run build:development -- --servedir=build",
+    "build:watch": "npm run build:development -- --watch",
     "build:development": "npm run build -- --sourcemap",
     "build:production": "npm run build -- --minify",
+    "build": "esbuild index.tsx --bundle --outfile=build/index.js",
     "test": "tsc --noEmit",
+    "test:watch": "npm run test -- --watch",
     "tsc": "tsc"
   },
   "keywords": [],

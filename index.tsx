@@ -39,7 +39,7 @@ const Record = ({ hero, place, mmr }: Game) => {
       <div>
         <img src={`images/heros/${hero}.png`} alt={hero} />
         <span className="place" style={{ position: "absolute" }}>
-          {place}
+          {place} wooo
         </span>
       </div>
       <div>
