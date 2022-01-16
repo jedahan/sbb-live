@@ -2,6 +2,11 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 
+const records: Game[] = [
+  { hero: "Merlin", place: 7, mmr: 3333 },
+  { hero: "Apocalypse", place: 1, mmr: 3500 },
+];
+
 ReactDOM.render(
   <React.StrictMode>
     <App />
@@ -23,7 +28,8 @@ function App() {
 type Place = number;
 const isPlace = (place: number): place is Place => place > 0 && place <= 8;
 
-type Hero = "Merlin" | "Sharebear" | "Mordred" | "Trophy Hunter" | "Apocalypse";
+const heros = ["Merlin", "Sharebear", "Mordred", "Apocalypse"] as const;
+type Hero = typeof heros[number];
 
 type Mmr = number;
 const isMmmr = (mmr: number): mmr is Mmr => mmr > 0;
@@ -33,13 +39,18 @@ interface Game {
   place: Place;
   mmr: Mmr;
 }
-const Record = ({ hero, place, mmr }: Game) => {
+function Record({ hero, place, mmr }: Game) {
+  const heroUri = `asssets/cards/SBB_HERO_${hero.toUpperCase()}.png`;
   return (
-    <div className="record" style={{ flexDirection: "row" }}>
+    <div
+      className="record"
+      style={{ flexDirection: "row" }}
+      key={[hero, place, mmr].join(".")}
+    >
       <div>
-        <img src={`images/heros/${hero}.png`} alt={hero} />
+        <img src={heroUri} alt={hero} />
         <span className="place" style={{ position: "absolute" }}>
-          {place} wooo
+          {place}
         </span>
       </div>
       <div>
@@ -47,9 +58,4 @@ const Record = ({ hero, place, mmr }: Game) => {
       </div>
     </div>
   );
-};
-
-const records: Game[] = [
-  { hero: "Merlin", place: 7, mmr: 3333 },
-  { hero: "Apocalypse", place: 1, mmr: 3500 },
-];
+}
