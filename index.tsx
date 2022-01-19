@@ -1,8 +1,8 @@
-import { fs, os } from '@tauri-apps/api'
 import React, { FocusEventHandler, ReactElement, useEffect, useState } from 'react'
+import { fs, os, path } from '@tauri-apps/api'
+import { parseLog } from './log.js'
 import ReactDOM from 'react-dom'
 import './index.css'
-import { parseLog } from './log.js'
 
 const heros = ['Merlin', 'Sharebear', 'Mordred', 'Apocalypse'] as const
 type Hero = typeof heros[number]
@@ -20,6 +20,7 @@ ReactDOM.render(
 
 function App (): ReactElement {
   const [records, setRecords] = useState<Game[]>()
+  const [logFile, setLogFile] = useState<string>()
   const [text, setText] = useState<string>()
   const [platform, setPlatform] = useState<string>()
   os.platform().then(setPlatform).catch(() => console.error('unknown platform'))
@@ -27,17 +28,25 @@ function App (): ReactElement {
   useEffect(() => {
     if (platform == null) return
     // TODO: allow setting folder path manually
-    // FIXME: don't hardcode my user path lol
-    const root = platform === 'win32'
-      ? 'C:\Users\micro\AppData\LocalLow\Good Luck Games\Storybook Brawl'
-      : '/Users/micro/src/sbb-match-tracker'
 
-    fs.readTextFile(`${root}/Player.log`)
-      .then(setText)
-      .catch(console.error)
+    path.dataDir()
+      .then(dataDir => {
+        const logpath = platform === 'win32'
+          ? [`${dataDir}Low`, 'Good Luck Games', 'Storybook Brawl', 'Player.log'].join('\\')
+          : [dataDir, 'Player.log'].join('/')
+        setLogFile(logpath)
+      })
+      .catch(reason => console.error(reason))
   }, [platform])
 
-  // TODO: update file when ?
+  useEffect(() => {
+    if (logFile == null) return
+    fs.readTextFile(logFile)
+      .then(setText)
+      .catch(console.error)
+  }, [logFile])
+
+  // TODO: Figure out how to tail the file
   useEffect(() => {
     if (text == null) return
     const lines = parseLog(text)
