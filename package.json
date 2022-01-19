@@ -7,11 +7,12 @@
     "format": "npm run ts-standard -- --fix",
     "start": "npm run test:watch & npm run serve",
     "serve": "npm run esbuild -- --sourcemap --servedir=build",
-    "build": "npm run esbuild -- --minify",
-
+    "build:web": "npm run esbuild -- --minify",
+    "build:debug": "npm run tauri build -- --debug",
+    "build": "npm run tauri build",
     "test:watch": "npm run tsc -- --watch",
     "test": "npm run tsc && npm run ts-standard",
-
+    "tauri": "tauri",
     "esbuild": "esbuild index.tsx --bundle --loader:.png=file --outfile=build/index.js",
     "ts-standard": "ts-standard",
     "tsc": "tsc --noEmit"
@@ -20,6 +21,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@tauri-apps/cli": "^1.0.0-beta.10",
     "@types/react": "^17.0.38",
     "@types/react-dom": "^17.0.11",
     "esbuild": "^0.14.11",
@@ -28,6 +30,7 @@
     "typescript": "^4.5.4"
   },
   "dependencies": {
+    "@tauri-apps/api": "^1.0.0-beta.8",
     "react-dom": "^17.0.2"
   }
 }

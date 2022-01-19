@@ -1,13 +1,5 @@
-// @ts-ignore start
-import log from './2021-07-player.log.txt'
-// @ts-ignore end
-
-const lines: string[] = log.split('\r\n')
-
-
 interface SomeObject extends Record<string, string | number | SomeObject> {}
-
-interface EnterResultsPhase extends Action {
+export interface EnterResultsPhaseAction extends Action {
   Hero: {
     Card: {
       ID: string
@@ -15,31 +7,32 @@ interface EnterResultsPhase extends Action {
   }
   Placement: number
 }
-
 interface Action extends SomeObject {
   Typeint: string
 }
 
 function parseObjectString (objectString: string): SomeObject {
-  const [key, ...values] = objectString
-    .split(':')
-    .map(item => item.trim())
+  const [key, ...values] = objectString.split(':').map((item) => item.trim())
 
   if (values.length > 1) return { [key]: parseObjectString(values.join(':')) }
 
   return { [key]: key === 'Placement' ? parseInt(values[0]) : values[0] }
 }
 
-function isEnterResultsPhase(action: Action): action is EnterResultsPhase {
+function isEnterResultsPhaseAction (
+  action: Action
+): action is EnterResultsPhaseAction {
   return action.Type === 'GLG.Transport.Actions.ActionEnterResultsPhase'
 }
 
-function isAction(action: Partial<SomeObject>): action is Action {
+function isAction (action: Partial<SomeObject>): action is Action {
   return 'Type' in action
 }
 
 function parseAction (actionString: string): Action {
-  if (!actionString.startsWith('- Action:')) throw new Error('Unknown action format')
+  if (!actionString.startsWith('- Action:')) {
+    throw new Error('Unknown action format')
+  }
 
   const action = actionString
     .replace('- Action:', '')
@@ -51,10 +44,11 @@ function parseAction (actionString: string): Action {
   return action
 }
 
-const actions = lines
-  .filter(line => line.startsWith('- Action:'))
-  .map(parseAction)
-  .filter(isEnterResultsPhase)
-  .slice(-10)
-
-export default actions
+export function parseLog (text: string): EnterResultsPhaseAction[] {
+  return text
+    .split('\r\n')
+    .filter((line) => line.startsWith('- Action:'))
+    .map(parseAction)
+    .filter(isEnterResultsPhaseAction)
+    .slice(-10)
+}
