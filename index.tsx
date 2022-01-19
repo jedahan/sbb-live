@@ -22,6 +22,8 @@ function App (): ReactElement {
   const [records, setRecords] = useState<Game[]>()
   const [logFile, setLogFile] = useState<string>()
   const [text, setText] = useState<string>()
+  const [logTimeout, setLogTimeout] = useState<NodeJS.Timer>()
+
   const [platform, setPlatform] = useState<string>()
   os.platform().then(setPlatform).catch(() => console.error('unknown platform'))
 
@@ -41,10 +43,16 @@ function App (): ReactElement {
 
   useEffect(() => {
     if (logFile == null) return
-    fs.readTextFile(logFile)
-      .then(setText)
-      .catch(console.error)
-  }, [logFile])
+    if (logTimeout !== null) return
+
+    setLogTimeout(
+      setInterval(() => {
+        fs.readTextFile(logFile)
+          .then(setText)
+          .catch(console.error)
+      }, 60 * 1000)
+    )
+  }, [logFile, logTimeout])
 
   // TODO: Figure out how to tail the file
   useEffect(() => {
