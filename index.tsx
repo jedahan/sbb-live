@@ -29,7 +29,7 @@ function App (): ReactElement {
     // TODO: allow setting folder path manually
     // FIXME: don't hardcode my user path lol
     const root = platform === 'win32'
-      ? '%APPDATA%/LocalLow/Good Luck Games/Storybook Brawl'
+      ? 'C:\Users\micro\AppData\LocalLow\Good Luck Games\Storybook Brawl'
       : '/Users/micro/src/sbb-match-tracker'
 
     fs.readTextFile(`${root}/Player.log`)
