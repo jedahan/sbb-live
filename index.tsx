@@ -34,8 +34,8 @@ function App (): ReactElement {
     path.dataDir()
       .then(dataDir => {
         const logpath = platform === 'win32'
-          ? [`${dataDir}Low`, 'Good Luck Games', 'Storybook Brawl', 'Player.log'].join('\\')
-          : [dataDir, 'Player.log'].join('/')
+          ? [`${dataDir}Low`, 'Good Luck Games', 'Storybook Brawl', 'Player.log'].join(path.sep)
+          : [dataDir, 'Player.log'].join(path.sep)
         setLogFile(logpath)
       })
       .catch(reason => console.error(reason))
