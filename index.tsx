@@ -3,6 +3,7 @@ import { fs, os, path } from '@tauri-apps/api'
 import { parseLog } from './log.js'
 import ReactDOM from 'react-dom'
 import './index.css'
+import defaultLog from './2021-07-player.log.txt'
 
 const heros = ['Merlin', 'Sharebear', 'Mordred', 'Apocalypse'] as const
 type Hero = typeof heros[number]
@@ -21,29 +22,29 @@ ReactDOM.render(
 function App (): ReactElement {
   const [records, setRecords] = useState<Game[]>()
   const [logFile, setLogFile] = useState<string>()
-  const [text, setText] = useState<string>()
+  const [text, setText] = useState<string>(defaultLog)
   const [logTimeout, setLogTimeout] = useState<NodeJS.Timer>()
 
   const [platform, setPlatform] = useState<string>()
-  os.platform().then(setPlatform).catch(() => console.error('unknown platform'))
+  os.platform()
+    .then(setPlatform)
+    .catch(console.error)
 
   useEffect(() => {
     if (platform == null) return
-    // TODO: allow setting folder path manually
+    if (platform !== 'win32') return
 
     path.dataDir()
       .then(dataDir => {
-        const logpath = platform === 'win32'
-          ? [`${dataDir}Low`, 'Good Luck Games', 'Storybook Brawl', 'Player.log'].join(path.sep)
-          : [dataDir, 'Player.log'].join(path.sep)
+        const logpath = [`${dataDir}Low`, 'Good Luck Games', 'Storybook Brawl', 'Player.log'].join(path.sep)
         setLogFile(logpath)
       })
-      .catch(reason => console.error(reason))
+      .catch(console.error)
   }, [platform])
 
   useEffect(() => {
     if (logFile == null) return
-    if (logTimeout !== null) return
+    if (logTimeout !== undefined) return
 
     setLogTimeout(
       setInterval(() => {
@@ -106,7 +107,7 @@ function App (): ReactElement {
         >
           <span>
             <h2>starting</h2>
-            <h1 contentEditable onBlur={setStartingMMR}>
+            <h1 contentEditable suppressContentEditableWarning onBlur={setStartingMMR}>
               {startingMMR}
             </h1>
           </span>
@@ -180,6 +181,7 @@ const Record: React.FC<Game & SetMMR> = ({ hero, placement, mmr, setMMR }) => {
 
       <span
         contentEditable
+        suppressContentEditableWarning
         onBlur={updateMMR}
         style={{
           fontSize,

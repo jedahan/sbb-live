@@ -9,6 +9,6 @@ a browser source (for obs) to show your recent match results in storybook brawl
 ## development
 
     npm install
-    npm run tauri dev
+    npm start
 
 ![screenshot](screenshot.png)

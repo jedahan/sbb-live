@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "format": "npm run ts-standard -- --fix",
-    "start": "npm run test:watch & npm run serve",
+    "start": "npm run test:watch & npm run serve & npm run tauri dev",
     "serve": "npm run esbuild -- --sourcemap --servedir=build",
     "build:web": "npm run esbuild -- --minify",
     "build:debug": "npm run tauri build -- --debug",
@@ -13,7 +13,7 @@
     "test:watch": "npm run tsc -- --watch",
     "test": "npm run tsc && npm run ts-standard",
     "tauri": "tauri",
-    "esbuild": "esbuild index.tsx --bundle --loader:.png=file --outfile=build/index.js",
+    "esbuild": "esbuild index.tsx --bundle --loader:.png=file --outdir=build",
     "ts-standard": "ts-standard",
     "tsc": "tsc --noEmit"
   },
