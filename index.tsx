@@ -1,4 +1,4 @@
-import React, { FocusEventHandler, ReactElement, useEffect, useState } from 'react'
+import React, { FocusEventHandler, ReactElement, useEffect, useState, useRef } from 'react'
 import { fs, os, path } from '@tauri-apps/api'
 import { parseLog } from './log.js'
 import ReactDOM from 'react-dom'
@@ -26,6 +26,8 @@ function App (): ReactElement {
   const [logTimeout, setLogTimeout] = useState<NodeJS.Timer>()
 
   const [platform, setPlatform] = useState<string>()
+  const inputRef = useRef(null)
+
   os.platform()
     .then(setPlatform)
     .catch(console.error)
@@ -70,8 +72,10 @@ function App (): ReactElement {
   }, [text])
 
   const [startingMMR, _setStartingMMR] = useState(0)
-  const setStartingMMR: FocusEventHandler<HTMLHeadingElement> = (event) =>
-    _setStartingMMR(parseInt(event?.target.innerText, 10))
+  const setStartingMMR: FocusEventHandler<HTMLInputElement> = () => {
+    if (!(inputRef && inputRef.current)) return
+    _setStartingMMR(parseInt(inputRef.current.value))
+  }
 
   const setMMR = (index: number, mmr: number): void => {
     if (records?.[index] == null) return
@@ -107,9 +111,22 @@ function App (): ReactElement {
         >
           <span>
             <h2>starting</h2>
-            <h1 contentEditable suppressContentEditableWarning onBlur={setStartingMMR}>
-              {startingMMR}
-            </h1>
+            <input ref={inputRef}
+              type={"number"} min={0} max={9999} step={100}
+              onChange={setStartingMMR}
+              placeholder={`${startingMMR}`}
+              list="defaultMMRs"
+              style={{
+                width: '6em'
+              }}
+              />
+            <datalist id="defaultMMRs">
+              <option value="1000" />
+              <option value="2000" />
+              <option value="3000" />
+              <option value="4000" />
+              <option value="5000" />
+            </datalist>
           </span>
           <span>
             <h2>current</h2>
@@ -150,8 +167,9 @@ interface SetMMR { setMMR: (mmr: number) => void }
 
 const Record: React.FC<Game & SetMMR> = ({ hero, placement, mmr, setMMR }) => {
   const heroUri = `/assets/cards/SBB_HERO_${hero.toUpperCase()}.png`
-  const fontSize = 80
   const textShadow = '6px 6px 2px black'
+  const imageSize = 100
+  const fontSize = imageSize / 3
 
   const updateMMR: FocusEventHandler<HTMLHeadingElement> = (event) =>
     setMMR(parseInt(event?.target.innerText))
@@ -169,10 +187,11 @@ const Record: React.FC<Game & SetMMR> = ({ hero, placement, mmr, setMMR }) => {
         style={{
           fontSize,
           textShadow: '6px 6px 2px black',
-          width: '161px',
-          height: '204px',
+          width: `${imageSize}px`,
           display: 'block',
           backgroundImage: `url(${heroUri})`,
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: 'contain',
           fontWeight: 'bold'
         }}
       >
