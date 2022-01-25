@@ -36,17 +36,18 @@ jobs:
         with:
           tagName: app-v__VERSION__
           releaseName: "Storybook Brawl Live v__VERSION__"
-          releaseBody: "See the assets to download this version and install."
+          releaseBody: "Release Build"
           releaseDraft: true
           prerelease: false
+
       - name: build debug app
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           args: --debug
-          tagName: app-v__VERSION__
+          tagName: app-v__VERSION__-debug
           releaseName: "Storybook Brawl Live v__VERSION__ (Debug)"
-          releaseBody: "See the assets to download this version and install."
+          releaseBody: "Debug build"
           releaseDraft: true
           prerelease: false
