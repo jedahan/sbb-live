@@ -62,7 +62,6 @@ function App (): ReactElement {
   const [startingMMR, setStartingMMR] = useState(0)
 
   const [platform, setPlatform] = useState<string>()
-  const inputRef = useRef(null)
 
   os.platform()
     .then(setPlatform)
