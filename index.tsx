@@ -3,6 +3,7 @@ import { fs, os, path } from '@tauri-apps/api'
 import { parseLog } from './log.js'
 import ReactDOM from 'react-dom'
 import './index.css'
+// @ts-expect-error
 import defaultLog from './2021-07-player.log.txt'
 
 const heros = ['Merlin', 'Sharebear', 'Mordred', 'Apocalypse'] as const
@@ -12,11 +13,45 @@ const HeroIDs: Record<string, Hero> = {
   '5e525924-1173-46c8-89c6-4729777818df': 'Merlin'
 }
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
+const StartingMMR: React.FC<{onChange: (mmr: number) => void}> = ({ onChange }) => {
+  const inputRef = useRef<HTMLInputElement|null>(null)
+
+  const setStartingMMR = (): void => {
+    if (inputRef?.current == null) return
+    onChange(inputRef.current.valueAsNumber)
+  }
+
+  return (
+    <div style={{ padding: '20px' }}>
+      <label htmlFor='startingMMR'>starting mmr</label>
+      <input
+        ref={inputRef}
+        id='startingMMR'
+        type='number' min={0} max={9999} step={100}
+        onChange={setStartingMMR}
+        list='defaultMMRs'
+      />
+      <datalist id='defaultMMRs'>
+        <option value='1000' />
+        <option value='2000' />
+        <option value='3000' />
+        <option value='4000' />
+        <option value='5000' />
+      </datalist>
+    </div>
+  )
+}
+
+const CurrentMMR: React.FC<{mmr: number}> = ({ mmr }) => (
+  <span style={{ padding: '20px' }}>
+    <label htmlFor='currentMMR'>current mmr</label>
+    <input
+      id='currentMMR'
+      type='number' min={0} max={9999} step={100}
+      value={mmr}
+      readOnly
+    />
+  </span>
 )
 
 function App (): ReactElement {
@@ -24,6 +59,7 @@ function App (): ReactElement {
   const [logFile, setLogFile] = useState<string>()
   const [text, setText] = useState<string>(defaultLog)
   const [logTimeout, setLogTimeout] = useState<NodeJS.Timer>()
+  const [startingMMR, setStartingMMR] = useState(0)
 
   const [platform, setPlatform] = useState<string>()
   const inputRef = useRef(null)
@@ -57,7 +93,6 @@ function App (): ReactElement {
     )
   }, [logFile, logTimeout])
 
-  // TODO: Figure out how to tail the file
   useEffect(() => {
     if (text == null) return
     const lines = parseLog(text)
@@ -70,12 +105,6 @@ function App (): ReactElement {
       })
     ))
   }, [text])
-
-  const [startingMMR, _setStartingMMR] = useState(0)
-  const setStartingMMR: FocusEventHandler<HTMLInputElement> = () => {
-    if (!(inputRef && inputRef.current)) return
-    _setStartingMMR(parseInt(inputRef.current.value))
-  }
 
   const setMMR = (index: number, mmr: number): void => {
     if (records?.[index] == null) return
@@ -97,43 +126,17 @@ function App (): ReactElement {
   const current = records?.reduce((sum, { mmr }) => mmr + sum, startingMMR)
 
   return (
-    <div className='App'>
-      <header className='App-header'>
-        <h2>mmr</h2>
-        <div
-          style={{
-            flexDirection: 'row',
-            display: 'flex',
-            flex: 1,
-            width: 300,
-            justifyContent: 'space-between'
-          }}
-        >
-          <span>
-            <h2>starting</h2>
-            <input ref={inputRef}
-              type={"number"} min={0} max={9999} step={100}
-              onChange={setStartingMMR}
-              placeholder={`${startingMMR}`}
-              list="defaultMMRs"
-              style={{
-                width: '6em'
-              }}
-              />
-            <datalist id="defaultMMRs">
-              <option value="1000" />
-              <option value="2000" />
-              <option value="3000" />
-              <option value="4000" />
-              <option value="5000" />
-            </datalist>
-          </span>
-          <span>
-            <h2>current</h2>
-            <h1>{current}</h1>
-          </span>
-        </div>
+    <div className='app'>
+      <header>
+        <h4>sbb match tracker</h4>
+      </header>
 
+      <section className='mmr' style={{ flex: 1, flexDirection: 'row' }}>
+        <StartingMMR onChange={setStartingMMR} />
+        <CurrentMMR mmr={current ?? 0} />
+      </section>
+
+      <section className='scores'>
         <h2>scores</h2>
 
         <div style={{ flexDirection: 'column' }}>
@@ -143,11 +146,11 @@ function App (): ReactElement {
               hero={hero}
               mmr={mmr}
               placement={placement}
-              setMMR={(mmr) => setMMR(index, mmr)}
+              setMMR={(mmr: number) => setMMR(index, mmr)}
             />
           ))}
         </div>
-      </header>
+      </section>
     </div>
   )
 }
@@ -158,7 +161,7 @@ type Placement = number
 /** Mmr should be a positive integer */
 type Mmr = number
 interface Game {
-  hero: Hero
+  hero: Hero | 'Unknown'
   placement: Placement
   mmr: Mmr
 }
@@ -171,7 +174,7 @@ const Record: React.FC<Game & SetMMR> = ({ hero, placement, mmr, setMMR }) => {
   const imageSize = 100
   const fontSize = imageSize / 3
 
-  const updateMMR: FocusEventHandler<HTMLHeadingElement> = (event) =>
+  const updateMMR: FocusEventHandler<HTMLSpanElement> = (event) =>
     setMMR(parseInt(event?.target.innerText))
 
   return (
@@ -214,3 +217,8 @@ const Record: React.FC<Game & SetMMR> = ({ hero, placement, mmr, setMMR }) => {
     </div>
   )
 }
+
+ReactDOM.render(
+  <React.StrictMode><App /></React.StrictMode>,
+  document.getElementById('root')
+)
