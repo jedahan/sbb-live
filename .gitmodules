@@ -1,3 +1,6 @@
 [submodule "assets"]
 	path = build/assets
 	url = https://github.com/SBBTracker/assets.git
+[submodule "build/SBBTracker"]
+	path = build/SBBTracker
+	url = https://github.com/SBBTracker/SBBTracker.git

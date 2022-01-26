@@ -1,11 +1,9 @@
 interface SomeObject extends Record<string, string | number | SomeObject> {}
 export interface EnterResultsPhaseAction extends Action {
-  Hero: {
-    Card: {
-      ID: string
-    }
-  }
+  CardTemplateId: number
+  RankReward: number
   Placement: number
+
 }
 interface Action extends SomeObject {
   Typeint: string
@@ -16,7 +14,7 @@ function parseObjectString (objectString: string): SomeObject {
 
   if (values.length > 1) return { [key]: parseObjectString(values.join(':')) }
 
-  return { [key]: key === 'Placement' ? parseInt(values[0]) : values[0] }
+  return { [key]: parseInt(values[0]) }
 }
 
 function isEnterResultsPhaseAction (

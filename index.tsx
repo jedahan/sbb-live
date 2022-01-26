@@ -1,17 +1,12 @@
-import React, { FocusEventHandler, ReactElement, useEffect, useState, useRef } from 'react'
+import React, { ReactElement, useEffect, useState, useRef } from 'react'
 import { fs, os, path } from '@tauri-apps/api'
 import { parseLog } from './log.js'
 import ReactDOM from 'react-dom'
 import './index.css'
 // @ts-expect-error
 import defaultLog from './2021-07-player.log.txt'
-
-const heros = ['Merlin', 'Sharebear', 'Mordred', 'Apocalypse'] as const
-type Hero = typeof heros[number]
-
-const HeroIDs: Record<string, Hero> = {
-  '5e525924-1173-46c8-89c6-4729777818df': 'Merlin'
-}
+// @ts-expect-error
+import templateIds from './build/SBBTracker/assets/template-ids.json'
 
 const StartingMMR: React.FC<{onChange: (mmr: number) => void}> = ({ onChange }) => {
   const inputRef = useRef<HTMLInputElement|null>(null)
@@ -97,30 +92,13 @@ function App (): ReactElement {
     const lines = parseLog(text)
 
     setRecords(lines.map(
-      ({ Hero: { Card: { ID } }, Placement }) => ({
-        hero: HeroIDs[ID] ?? 'Unknown',
+      ({ CardTemplateId, Placement, RankReward }) => ({
+        hero: templateIds[CardTemplateId].Name,
         placement: Placement,
-        mmr: Math.round(-100 + 25 * (8 - Placement) - 10 + Math.random() * 20)
+        mmr: RankReward
       })
     ))
   }, [text])
-
-  const setMMR = (index: number, mmr: number): void => {
-    if (records?.[index] == null) return
-
-    const record = {
-      hero: records[index].hero,
-      placement: records[index].placement,
-      mmr
-    }
-
-    const newRecords = [
-      ...records.slice(0, index),
-      record,
-      ...records.slice(index + 1)
-    ]
-    setRecords(newRecords)
-  }
 
   const current = records?.reduce((sum, { mmr }) => mmr + sum, startingMMR)
 
@@ -145,7 +123,6 @@ function App (): ReactElement {
               hero={hero}
               mmr={mmr}
               placement={placement}
-              setMMR={(mmr: number) => setMMR(index, mmr)}
             />
           ))}
         </div>
@@ -160,21 +137,18 @@ type Placement = number
 /** Mmr should be a positive integer */
 type Mmr = number
 interface Game {
-  hero: Hero | 'Unknown'
+  hero: string
   placement: Placement
   mmr: Mmr
 }
 
-interface SetMMR { setMMR: (mmr: number) => void }
+const MMR = new Intl.NumberFormat('en-US', { signDisplay: 'always' })
 
-const Record: React.FC<Game & SetMMR> = ({ hero, placement, mmr, setMMR }) => {
+const Record: React.FC<Game> = ({ hero, placement, mmr }) => {
   const heroUri = `/assets/cards/SBB_HERO_${hero.toUpperCase()}.png`
   const textShadow = '6px 6px 2px black'
   const imageSize = 100
   const fontSize = imageSize / 3
-
-  const updateMMR: FocusEventHandler<HTMLSpanElement> = (event) =>
-    setMMR(parseInt(event?.target.innerText))
 
   return (
     <div
@@ -201,9 +175,6 @@ const Record: React.FC<Game & SetMMR> = ({ hero, placement, mmr, setMMR }) => {
       </span>
 
       <span
-        contentEditable
-        suppressContentEditableWarning
-        onBlur={updateMMR}
         style={{
           fontSize,
           textShadow,
@@ -211,7 +182,7 @@ const Record: React.FC<Game & SetMMR> = ({ hero, placement, mmr, setMMR }) => {
           flexGrow: 1
         }}
       >
-        {mmr > 0 ? `+${mmr}` : mmr}
+        {MMR.format(mmr)}
       </span>
     </div>
   )
