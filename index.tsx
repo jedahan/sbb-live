@@ -4,7 +4,7 @@ import { parseLog } from './log.js'
 import ReactDOM from 'react-dom'
 import './index.css'
 // @ts-expect-error
-import defaultLog from './2021-07-player.log.txt'
+import defaultLog from './Player.log.txt'
 // @ts-expect-error
 import templateIds from './build/SBBTracker/assets/template-ids.json'
 
