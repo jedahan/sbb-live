@@ -7,14 +7,13 @@ body {
   background-color: #282c34;
   min-height: 100vh;
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
   color: white;
+}
 
-  display: 'flex';
-  justify-content: 'space-around';
+label {
+  padding-right: 1em;
+  font-size: 1em;
 }
 
 code {
@@ -29,6 +28,7 @@ input {
   color: white;
   font-size: 2em;
   background-color: #282c34;
+  text-align: end;
 }
 
 .app {

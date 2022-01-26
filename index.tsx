@@ -147,17 +147,13 @@ const MMR = new Intl.NumberFormat('en-US', { signDisplay: 'always' })
 const Record: React.FC<Game> = ({ hero, placement, mmr }) => {
   const heroUri = `/assets/cards/SBB_HERO_${hero.toUpperCase()}.png`
   const textShadow = '6px 6px 2px black'
-  const imageSize = 100
+  const imageSize = 200
   const fontSize = imageSize / 3
 
   return (
     <div
       className='record'
-      style={{
-        flexDirection: 'row',
-        display: 'flex',
-        alignItems: 'end'
-      }}
+      style={{ display: 'flex' }}
     >
       <span
         style={{
@@ -178,8 +174,6 @@ const Record: React.FC<Game> = ({ hero, placement, mmr }) => {
         style={{
           fontSize,
           textShadow,
-          textAlign: 'end',
-          flexGrow: 1
         }}
       >
         {MMR.format(mmr)}
