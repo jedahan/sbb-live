@@ -14,7 +14,7 @@ function parseObjectString (objectString: string): SomeObject {
 
   if (values.length > 1) return { [key]: parseObjectString(values.join(':')) }
 
-  return { [key]: parseInt(values[0]) }
+  return { [key]: ['RankReward', 'CardTemplateId', 'Placement'].includes(key) ? parseInt(values[0]) : values[0] }
 }
 
 function isEnterResultsPhaseAction (
@@ -28,12 +28,8 @@ function isAction (action: Partial<SomeObject>): action is Action {
 }
 
 function parseAction (actionString: string): Action {
-  if (!actionString.startsWith('- Action:')) {
-    throw new Error('Unknown action format')
-  }
-
   const action = actionString
-    .replace('- Action:', '')
+    .replace(/^.*- Action: /,'')
     .split('|')
     .map(parseObjectString)
     .reduce((act, property) => Object.assign(act, property), {})
@@ -45,7 +41,7 @@ function parseAction (actionString: string): Action {
 export function parseLog (text: string): EnterResultsPhaseAction[] {
   return text
     .split('\r\n')
-    .filter((line) => line.startsWith('- Action:'))
+    .filter((line) => line.includes('- Action:'))
     .map(parseAction)
     .filter(isEnterResultsPhaseAction)
     .slice(-10)

@@ -55,6 +55,7 @@ function App (): ReactElement {
   const [text, setText] = useState<string>(defaultLog)
   const [logTimeout, setLogTimeout] = useState<NodeJS.Timer>()
   const [startingMMR, setStartingMMR] = useState(0)
+  const [current, setCurrent] = useState(0)
 
   const [platform, setPlatform] = useState<string>()
 
@@ -64,11 +65,11 @@ function App (): ReactElement {
 
   useEffect(() => {
     if (platform == null) return
-    if (platform !== 'win32') return
+    if (platform !== 'windows') return
 
     path.dataDir()
       .then(dataDir => {
-        const logpath = [`${dataDir}Low`, 'Good Luck Games', 'Storybook Brawl', 'Player.log'].join(path.sep)
+        const logpath = [dataDir.replace('Roaming','LocalLow'), 'Good Luck Games', 'Storybook Brawl', 'Player.log'].join(path.sep)
         setLogFile(logpath)
       })
       .catch(console.error)
@@ -90,17 +91,19 @@ function App (): ReactElement {
   useEffect(() => {
     if (text == null) return
     const lines = parseLog(text)
-
     setRecords(lines.map(
       ({ CardTemplateId, Placement, RankReward }) => ({
-        hero: templateIds[CardTemplateId].Name,
+        hero: templateIds[CardTemplateId],
         placement: Placement,
         mmr: RankReward
       })
     ))
   }, [text])
 
-  const current = records?.reduce((sum, { mmr }) => mmr + sum, startingMMR)
+  useEffect(() => {
+    if (records == null) return
+    setCurrent(records?.reduce((sum, { mmr }) => mmr + sum, startingMMR))
+  }, [records, startingMMR])
 
   return (
     <div className='app'>
@@ -136,8 +139,12 @@ type Placement = number
 
 /** Mmr should be a positive integer */
 type Mmr = number
+type Hero = {
+  Id: string
+  Name: string
+}
 interface Game {
-  hero: string
+  hero: Hero
   placement: Placement
   mmr: Mmr
 }
@@ -145,7 +152,7 @@ interface Game {
 const MMR = new Intl.NumberFormat('en-US', { signDisplay: 'always' })
 
 const Record: React.FC<Game> = ({ hero, placement, mmr }) => {
-  const heroUri = `/assets/cards/SBB_HERO_${hero.toUpperCase()}.png`
+  const heroUri = `/assets/cards/${hero.Id}.png`
   const textShadow = '6px 6px 2px black'
   const imageSize = 200
   const fontSize = imageSize / 3
