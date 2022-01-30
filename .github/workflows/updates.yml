@@ -11,13 +11,13 @@ jobs:
       - name: deploy updates.json
         run: |
           echo { \
-            "name": "${{ github.release.name }}", \
-            "notes": "${{ github.release.body }}", \
-            "pub_date": "${{ github.release.published_at }}", \
+            "name": "${{ github.event.release.name }}", \
+            "notes": "${{ github.event.release.body }}", \
+            "pub_date": "${{ github.event.release.published_at }}", \
             "platforms": { \
               "win64": { \
                 "signature": "", \
-                "url": "${{ github.release.assets[0].browser_download_url }}" \
+                "url": "${{ github.event.release.assets[0].browser_download_url }}" \
               } \
             } \
           }
