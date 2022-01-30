@@ -1,0 +1,24 @@
+name: publish updater
+
+on:
+  release: [ published ]
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: update the updates.json
+        run: |
+          echo {
+            "name":"v1.0.0",
+            "notes":"Test version",
+            "pub_date":"2020-06-22T19:25:57Z",
+            "platforms": {
+              "win64": {
+                "signature": "",
+                "url": "{{ release.assets[0].browser_download_url }}"
+              }
+            }
+          }
