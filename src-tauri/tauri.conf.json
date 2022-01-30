@@ -46,7 +46,10 @@
       }
     },
     "updater": {
-      "active": false
+      "active": true,
+      "endpoints": [
+        "https://gist.githubusercontent.com/jedahan/d200fcfcadc2220d6885a1a311bcbd3e/raw/4943fe15a0cadbbca1b0648e9f3a0ff34189e01c/updates.json"
+      ]
     },
     "allowlist": {
       "all": false,
