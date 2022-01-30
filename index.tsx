@@ -170,7 +170,6 @@ const MMR = new Intl.NumberFormat('en-US', { signDisplay: 'always' })
 
 const Record: React.FC<Game> = ({ hero, placement, mmr }) => {
   const heroUri = `/assets/cards/${hero.Id}.png`
-  const textShadow = '6px 6px 2px black'
 
   return (
     <div
