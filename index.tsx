@@ -66,19 +66,19 @@ const CurrentMMR: React.FC<{ startingMMR: number, records?: Game[] }> = ({ start
 }
 
 const useLogpath = async () => {
-  const logfile = 'Player.log'
-
   const platform = await os.platform()
-  if (platform !== 'windows') return logfile
+  if (platform !== 'windows') return null
 
-  const datadir = (await path.dataDir()).replace('Roaming', 'LocalLow')
-  return [datadir, 'Good Luck Games', 'Storybook Brawl', logfile].join(path.sep)
+  const home = await path.homeDir()
+  return path.resolve(home, 'LocalLow', 'Good Luck Games', 'Storybook Brawl', 'Player.log')
 }
 
-const useReadloop = (path: string, pollseconds: number) => {
+/** Given a path, poll to reread  */
+const useReadloop = (pollseconds: number, path: string | null) => {
   const [text, setText] = useState<string>(defaultLog)
 
   useInterval(() => {
+    if (path == null) return
     fs.readTextFile(path)
       .then(setText)
       .catch(console.error)
@@ -104,10 +104,10 @@ const useInterval = (callback: () => void, delay: number) => {
 const useRecords = () => {
   const [records, setRecords] = useState<Game[]>()
 
-  const [logpath, setLogpath] = useState('')
+  const [logpath, setLogpath] = useState<string|null>(null)
   useLogpath().then(setLogpath)
 
-  const text = useReadloop(logpath, 60)
+  const text = useReadloop(60, logpath)
 
   useEffect(() => {
     if (text == null) return
