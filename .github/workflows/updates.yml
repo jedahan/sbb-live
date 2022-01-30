@@ -9,7 +9,7 @@ jobs:
 
     steps:
       - name: deploy updates.json
-      - uses: sergeysova/gist-write-action@v1
+        uses: sergeysova/gist-write-action@v1
         with:
           gist_id: d200fcfcadc2220d6885a1a311bcbd3e
           file_name: updates.json
