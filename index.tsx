@@ -6,7 +6,8 @@ import './index.css'
 // @ts-expect-error
 import defaultLog from './Player.log.txt'
 // @ts-expect-error
-import templateIds from './build/SBBTracker/assets/template-ids.json'
+import templateIds from './vendor/SBBTracker/assets/template-ids.json'
+import heroImages from './heroImages.js'
 
 const StartingMMR: React.FC<{ onChange: (mmr: number) => void, startingMMR: number }> = ({ onChange, startingMMR }) => {
   const inputRef = useRef<HTMLInputElement | null>(null)
@@ -169,7 +170,8 @@ interface Game {
 const MMR = new Intl.NumberFormat('en-US', { signDisplay: 'always' })
 
 const Record: React.FC<Game> = ({ hero, placement, mmr }) => {
-  const heroUri = `/assets/cards/${hero.Id}.png`
+  const heroName = hero.Id.replace('SBB_HERO_','').replace(',','_').replace('-','_')
+  const heroImage = heroImages[heroName]
 
   return (
     <div
@@ -181,7 +183,7 @@ const Record: React.FC<Game> = ({ hero, placement, mmr }) => {
           fontSize: '4em',
           textShadow: '6px 6px 2px black',
           width: '1.5em',
-          backgroundImage: `url(${heroUri})`,
+          backgroundImage: `url(${heroImage})`,
           backgroundRepeat: 'no-repeat',
           backgroundPosition: 'center',
           fontWeight: 'bold'
