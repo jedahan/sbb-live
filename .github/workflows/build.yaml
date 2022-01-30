@@ -36,20 +36,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: app-v__VERSION__
+          tagName: v__VERSION__
           releaseName: "Storybook Brawl Live v__VERSION__"
-          releaseBody: "Release build"
-          releaseDraft: false
-          prerelease: true
-
-      - name: build debug app
-        uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          args: --debug
-          tagName: app-v__VERSION__-debug
-          releaseName: "Storybook Brawl Live v__VERSION__ (Debug)"
-          releaseBody: "Debug build"
-          releaseDraft: true
-          prerelease: false
+          includeDebug: true
