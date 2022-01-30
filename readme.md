@@ -4,8 +4,8 @@ A window that shows your recent match results in storybook brawl
 
 ## development
 
-    git clone --recursive --shallow-submodules https://github.com/jedahan/sbb-match-tracker
-    cd sbb-match-tracker
+    git clone --recursive --shallow-submodules https://github.com/jedahan/sbb-live
+    cd sbb-live
     npm install
     npm start
 
