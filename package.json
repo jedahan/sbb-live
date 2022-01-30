@@ -8,12 +8,10 @@
     "dev": "npm run tauri dev",
     "lint": "npm run ts-standard",
     "format": "npm run ts-standard -- --fix",
-
     "build:watch": "npm run esbuild -- --sourcemap --servedir=build",
     "build": "npm run tauri build",
     "build:debug": "npm run tauri build --debug",
     "check:watch": "npm run tsc -- --watch",
-
     "ts-standard": "ts-standard",
     "tsc": "tsc --noEmit",
     "esbuild": "esbuild index.tsx --bundle --loader:.png=file --outdir=build",
@@ -27,10 +25,10 @@
     "@types/react": "^17.0.38",
     "@types/react-dom": "^17.0.11",
     "concurrently": "^7.0.0",
-    "esbuild": "^0.14.11",
+    "esbuild": "^0.14.14",
     "react": "^17.0.2",
     "ts-standard": "^11.0.0",
-    "typescript": "^4.5.4"
+    "typescript": "^4.5.5"
   },
   "dependencies": {
     "@tauri-apps/api": "^1.0.0-beta.8",
