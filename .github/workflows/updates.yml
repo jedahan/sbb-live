@@ -14,14 +14,14 @@ jobs:
           gist_id: d200fcfcadc2220d6885a1a311bcbd3e
           file_name: updates.json
           content: >
-          {
-            "name": "${{ github.event.release.name }}",
-            "notes": "${{ github.event.release.body }}",
-            "pub_date": "${{ github.event.release.published_at }}",
-            "platforms": {
-              "win64": {
-                "signature": "",
-                "url": "${{ github.event.release.assets[0].browser_download_url }}"
+            {
+              "name": "${{ github.event.release.name }}",
+              "notes": "${{ github.event.release.body }}",
+              "pub_date": "${{ github.event.release.published_at }}",
+              "platforms": {
+                "win64": {
+                  "signature": "",
+                  "url": "${{ github.event.release.assets[0].browser_download_url }}"
+                }
               }
             }
-          }
