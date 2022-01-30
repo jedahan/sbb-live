@@ -8,16 +8,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: update the updates.json
+      - name: deploy updates.json
         run: |
           echo { \
-            "name": "${{ release.name }}", \
-            "notes": "${{ release.body }}", \
-            "pub_date": "${{ release.published_at }}", \
+            "name": "${{ github.release.name }}", \
+            "notes": "${{ github.release.body }}", \
+            "pub_date": "${{ github.release.published_at }}", \
             "platforms": { \
               "win64": { \
                 "signature": "", \
-                "url": "${{ release.assets[0].browser_download_url }}" \
+                "url": "${{ github.release.assets[0].browser_download_url }}" \
               } \
             } \
           }
