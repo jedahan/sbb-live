@@ -49,9 +49,7 @@
       "active": false
     },
     "allowlist": {
-      "fs": {
-        "readTextFile": true
-      }
+      "all": true
     },
     "windows": [
       {
