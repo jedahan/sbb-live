@@ -2,6 +2,7 @@ name: publish updater
 
 on:
   release:
+    types: [published]
 
 jobs:
   publish:
