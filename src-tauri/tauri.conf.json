@@ -53,9 +53,8 @@
     },
     "windows": [
       {
-        "title": "storybook brawl live",
-        "width": 400,
-        "height": 1080,
+        "title": "sbb live",
+        "width": 150,
         "resizable": true,
         "fullscreen": false
       }

@@ -8,7 +8,7 @@ import defaultLog from './Player.log.txt'
 // @ts-expect-error
 import templateIds from './build/SBBTracker/assets/template-ids.json'
 
-const StartingMMR: React.FC<{ onChange: (mmr: number) => void }> = ({ onChange }) => {
+const StartingMMR: React.FC<{ onChange: (mmr: number) => void, startingMMR: number }> = ({ onChange, startingMMR }) => {
   const inputRef = useRef<HTMLInputElement | null>(null)
 
   const setStartingMMR = (): void => {
@@ -16,15 +16,24 @@ const StartingMMR: React.FC<{ onChange: (mmr: number) => void }> = ({ onChange }
     onChange(inputRef.current.valueAsNumber)
   }
 
+  const fontSize = '1.5em'
+
   return (
-    <div style={{ padding: '20px' }}>
-      <label htmlFor='startingMMR'>starting mmr</label>
+    <div style={{marginTop: '1em', marginBottom: '1em'}}>
       <input
         ref={inputRef}
         id='startingMMR'
+        style={{
+          borderWidth: 0,
+          color: 'white',
+          fontSize,
+          width: '4em',
+          backgroundColor: 'hsl(240, 8%, 8%)',
+        }}
         type='number' min={0} max={9999} step={100}
         onChange={setStartingMMR}
         list='defaultMMRs'
+        defaultValue={startingMMR}
       />
       <datalist id='defaultMMRs'>
         <option value='1000' />
@@ -33,6 +42,7 @@ const StartingMMR: React.FC<{ onChange: (mmr: number) => void }> = ({ onChange }
         <option value='4000' />
         <option value='5000' />
       </datalist>
+      <label htmlFor='startingMMR'>starting</label>
     </div>
   )
 }
@@ -46,15 +56,12 @@ const CurrentMMR: React.FC<{ startingMMR: number, records?: Game[] }> = ({ start
   }, [records, startingMMR])
 
   return (
-    <span style={{ padding: '20px' }}>
-      <label htmlFor='currentMMR'>current mmr</label>
-      <input
-        id='currentMMR'
-        type='number' min={0} max={9999} step={100}
-        value={currentMMR}
-        readOnly
-      />
-    </span>
+    <div>
+      <span style={{
+        color: 'goldenrod',
+        fontSize: 'xx-large'
+      }}>{currentMMR} mmr</span>
+    </div>
   )
 }
 
@@ -118,23 +125,17 @@ const useRecords = () => {
 }
 
 function App(): ReactElement {
-  const [startingMMR, setStartingMMR] = useState(0)
+  const [startingMMR, setStartingMMR] = useState(4000)
   const records = useRecords()
 
   return (
     <div className='app'>
-      <header>
-        <h4>sbb match tracker</h4>
-      </header>
-
-      <section className='mmr' style={{ flex: 1, flexDirection: 'row' }}>
-        <StartingMMR onChange={setStartingMMR} />
+      <section style={{ flex: 1 }}>
         <CurrentMMR startingMMR={startingMMR} records={records} />
+        <StartingMMR startingMMR={startingMMR} onChange={setStartingMMR} />
       </section>
 
       <section className='scores'>
-        <h2>scores</h2>
-
         <div style={{ flexDirection: 'column' }}>
           {records?.map(({ hero, mmr, placement }, index) => (
             <Record
@@ -170,23 +171,20 @@ const MMR = new Intl.NumberFormat('en-US', { signDisplay: 'always' })
 const Record: React.FC<Game> = ({ hero, placement, mmr }) => {
   const heroUri = `/assets/cards/${hero.Id}.png`
   const textShadow = '6px 6px 2px black'
-  const imageSize = 200
-  const fontSize = imageSize / 3
 
   return (
     <div
       className='record'
-      style={{ display: 'flex' }}
+      style={{ display: 'flex', flexDirection: 'row', alignContent: 'space-between' }}
     >
       <span
         style={{
-          fontSize,
+          fontSize: '4em',
           textShadow: '6px 6px 2px black',
-          width: `${imageSize}px`,
-          display: 'block',
+          width: '1.5em',
           backgroundImage: `url(${heroUri})`,
           backgroundRepeat: 'no-repeat',
-          backgroundSize: 'contain',
+          backgroundPosition: 'center',
           fontWeight: 'bold'
         }}
       >
@@ -195,8 +193,10 @@ const Record: React.FC<Game> = ({ hero, placement, mmr }) => {
 
       <span
         style={{
-          fontSize,
-          textShadow,
+          fontSize: '2em',
+          flexGrow: 1,
+          alignSelf: 'flex-end',
+          textAlign: 'end'
         }}
       >
         {MMR.format(mmr)}
