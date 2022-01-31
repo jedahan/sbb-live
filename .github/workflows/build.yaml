@@ -1,4 +1,4 @@
-name: build
+name: build and release
 on:
   workflow_dispatch:
   release:
@@ -8,10 +8,11 @@ on:
       - main
 
 jobs:
-  build:
+  build-and-release:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: checkout code
+        uses: actions/checkout@v2
         with:
           submodules: true
 
@@ -31,7 +32,7 @@ jobs:
       - name: build frontend
         run: npm run esbuild
 
-      - name: build release app
+      - name: build and release app
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
