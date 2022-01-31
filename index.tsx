@@ -71,15 +71,18 @@ const useLogpath = async () => {
   if (platform !== 'windows') return null
 
   const home = await path.homeDir()
-  return path.resolve(home, 'LocalLow', 'Good Luck Games', 'Storybook Brawl', 'Player.log')
+  const data = ['AppData', 'LocalLow', 'Good Luck Games', 'Storybook Brawl']
+  const logpath = await path.resolve(home, ...data, 'Player.log')
+  return logpath
 }
 
 /** Given a path, poll to reread  */
-const useReadloop = (pollseconds: number, path: string | null) => {
+const useReadloop = (pollseconds: number, getPath: () => string|null) => {
   const [text, setText] = useState<string>(defaultLog)
 
   useInterval(() => {
-    if (path == null) return
+    const path = getPath()
+    if (path==null) return
     fs.readTextFile(path)
       .then(setText)
       .catch(console.error)
@@ -104,11 +107,8 @@ const useInterval = (callback: () => void, delay: number) => {
 
 const useRecords = () => {
   const [records, setRecords] = useState<Game[]>()
-
   const [logpath, setLogpath] = useState<string|null>(null)
-  useLogpath().then(setLogpath)
-
-  const text = useReadloop(60, logpath)
+  const text = useReadloop(10, () => logpath)
 
   useEffect(() => {
     if (text == null) return
@@ -122,6 +122,7 @@ const useRecords = () => {
     ))
   }, [text])
 
+  useLogpath().then(setLogpath)
   return records
 }
 
