@@ -3,11 +3,9 @@ import { fs, os, path } from '@tauri-apps/api'
 import { parseLog } from './log.js'
 import ReactDOM from 'react-dom'
 import './index.css'
-// @ts-expect-error
-import defaultLog from './Player.log.txt'
+import heroImages from './heroImages.js'
 // @ts-expect-error
 import templateIds from './vendor/SBBTracker/assets/template-ids.json'
-import heroImages from './heroImages.js'
 
 const StartingMMR: React.FC<{ onChange: (mmr: number) => void, startingMMR: number }> = ({ onChange, startingMMR }) => {
   const inputRef = useRef<HTMLInputElement | null>(null)
@@ -78,7 +76,7 @@ const useLogpath = async () => {
 
 /** Given a path, poll to reread  */
 const useReadloop = (pollseconds: number, getPath: () => string|null) => {
-  const [text, setText] = useState<string>(defaultLog)
+  const [text, setText] = useState('')
 
   useInterval(() => {
     const path = getPath()
