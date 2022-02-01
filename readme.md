@@ -14,3 +14,5 @@ A window that shows your recent match results in storybook brawl
 ## credits
 
 Thanks to @raschy of https://github.com/SBBTracker/SBBTracker for doing most of the original work parsing log files, and general advice
+
+Thanks to @trynet https://twitch.tv/trynet123 for inspiration to make this
