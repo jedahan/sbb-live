@@ -7,32 +7,37 @@ import heroImages from './heroImages.js'
 // @ts-expect-error
 import templateIds from './vendor/SBBTracker/assets/template-ids.json'
 
-const StartingMMR: React.FC<{ onChange: (mmr: number) => void, startingMMR: number }> = ({ onChange, startingMMR }) => {
+const Mmr: React.FC<{records: Game[]}> = ({ records }) => {
   const inputRef = useRef<HTMLInputElement | null>(null)
+  const [mmr, setMmr] = useState(3000)
+  const [startingMmr, setStartingMmr] = useState(3000)
 
-  const setStartingMMR = (): void => {
-    if (inputRef?.current == null) return
-    onChange(inputRef.current.valueAsNumber)
-  }
+  // If the records change, update the mmr
+  useEffect(() => {
+    setMmr(startingMmr + records.reduce((total, { mmr }) => total + mmr, 0))
+  }, [records])
 
-  const fontSize = '1.5em'
+  // If the mmr changes, update the startingMmr
+  useEffect(() => {
+    setStartingMmr(mmr - records.reduce((total, { mmr }) => total + mmr, 0))
+  }, [mmr])
 
   return (
-    <div style={{marginTop: '1em', marginBottom: '1em'}}>
+    <div style={{ marginTop: '1em', marginBottom: '1em' }}>
       <input
         ref={inputRef}
-        id='startingMMR'
+        id='mmr'
         style={{
           borderWidth: 0,
-          color: 'white',
-          fontSize,
-          width: '4em',
-          backgroundColor: 'hsl(240, 8%, 8%)',
+          color: 'goldenrod',
+          fontSize: '1.5em',
+          width: '3em',
+          backgroundColor: 'hsl(240, 8%, 8%)'
         }}
         type='number' min={0} max={9999} step={100}
-        onChange={setStartingMMR}
+        onChange={() => inputRef?.current !== null && setMmr(inputRef.current.valueAsNumber)}
         list='defaultMMRs'
-        defaultValue={startingMMR}
+        defaultValue={mmr}
       />
       <datalist id='defaultMMRs'>
         <option value='1000' />
@@ -41,30 +46,12 @@ const StartingMMR: React.FC<{ onChange: (mmr: number) => void, startingMMR: numb
         <option value='4000' />
         <option value='5000' />
       </datalist>
-      <label htmlFor='startingMMR'>starting</label>
+      <label style={{ color: 'goldenrod' }} htmlFor='startingMMR'>mmr</label>
     </div>
   )
 }
 
-const CurrentMMR: React.FC<{ startingMMR: number, records?: Game[] }> = ({ startingMMR, records }) => {
-  const [currentMMR, setCurrentMMR] = useState(0)
-
-  useEffect(() => {
-    if (records == null) return
-    setCurrentMMR(records?.reduce((sum, { mmr }) => mmr + sum, startingMMR))
-  }, [records, startingMMR])
-
-  return (
-    <div>
-      <span style={{
-        color: 'goldenrod',
-        fontSize: 'xx-large'
-      }}>{currentMMR} mmr</span>
-    </div>
-  )
-}
-
-const useLogpath = async () => {
+const useLogpath = async (): Promise<string|null> => {
   const platform = await os.platform()
   if (platform !== 'windows') return null
 
@@ -75,12 +62,12 @@ const useLogpath = async () => {
 }
 
 /** Given a path, poll to reread  */
-const useReadloop = (pollseconds: number, getPath: () => string|null) => {
+const useReadloop = (pollseconds: number, getPath: () => string|null): string => {
   const [text, setText] = useState('')
 
   useInterval(() => {
     const path = getPath()
-    if (path==null) return
+    if (path == null) return
     fs.readTextFile(path)
       .then(setText)
       .catch(console.error)
@@ -89,7 +76,7 @@ const useReadloop = (pollseconds: number, getPath: () => string|null) => {
   return text
 }
 
-const useInterval = (callback: () => void, delay: number) => {
+const useInterval = (callback: () => void, delay: number): void => {
   const savedCallback = useRef(callback)
 
   useEffect(() => {
@@ -97,14 +84,14 @@ const useInterval = (callback: () => void, delay: number) => {
   }, [callback])
 
   useEffect(() => {
-    if (!delay && delay !== 0) return
+    if (delay === 0) return
     const id = setInterval(() => savedCallback.current(), delay)
     return () => clearInterval(id)
   }, [delay])
 }
 
-const useRecords = () => {
-  const [records, setRecords] = useState<Game[]>()
+const useRecords = (): Game[] => {
+  const [records, setRecords] = useState<Game[]>([])
   const [logpath, setLogpath] = useState<string|null>(null)
   const text = useReadloop(10, () => logpath)
 
@@ -120,19 +107,17 @@ const useRecords = () => {
     ))
   }, [text])
 
-  useLogpath().then(setLogpath)
+  void useLogpath().then(setLogpath)
   return records
 }
 
-function App(): ReactElement {
-  const [startingMMR, setStartingMMR] = useState(4000)
+function App (): ReactElement {
   const records = useRecords()
 
   return (
     <div className='app'>
       <section style={{ flex: 1 }}>
-        <CurrentMMR startingMMR={startingMMR} records={records} />
-        <StartingMMR startingMMR={startingMMR} onChange={setStartingMMR} />
+        <Mmr records={records} />
       </section>
 
       <section className='scores'>
@@ -154,22 +139,21 @@ function App(): ReactElement {
 /** Placement should be an integer between 1 and 8 inclusive */
 type Placement = number
 
-/** Mmr should be a positive integer */
-type Mmr = number
-type Hero = {
+interface Hero {
   Id: string
   Name: string
 }
+
 interface Game {
   hero: Hero
   placement: Placement
-  mmr: Mmr
+  mmr: number
 }
 
-const MMR = new Intl.NumberFormat('en-US', { signDisplay: 'always' })
+const formatMMR = (new Intl.NumberFormat('en-US', { signDisplay: 'always' })).format
 
 const Record: React.FC<Game> = ({ hero, placement, mmr }) => {
-  const heroName = hero.Id.replace('SBB_HERO_','').replace(',','_').replace('-','_')
+  const heroName = hero.Id.replace('SBB_HERO_', '').replace(',', '_').replace('-', '_')
   const heroImage = heroImages[heroName]
 
   return (
@@ -199,7 +183,7 @@ const Record: React.FC<Game> = ({ hero, placement, mmr }) => {
           textAlign: 'end'
         }}
       >
-        {MMR.format(mmr)}
+        {formatMMR(mmr)}
       </span>
     </div>
   )
